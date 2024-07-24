@@ -1,0 +1,17 @@
+---> 23/07/2024
+
+> Utilizar una columna más grande para el password dado que al ser encriptado puede crecer.
+
+> Historial de Password (Evaluarlo)
+
+> Auditoria hija de tbl_Session - Especie de Logs en la cual se almacene los cambios que el usuario provocó al momento de navegar dentro del sistema.
+
+> Estandarizar el idioma en los nombres de columnas.
+
+> Congruencia entre tipos de columnas ID
+
+> UNIQUE CONSTRAINT para columnas que según la lógica de negocio se requiera.
+
+> Investigar tema del FINGERPRINT en navegadores.
+
+> Cargar información DUMMY en las tablas a la hora de desplegar.
