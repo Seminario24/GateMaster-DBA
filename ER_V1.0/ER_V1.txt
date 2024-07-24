@@ -1,0 +1,61 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table tbl_Roles {
+  Rol_ID integer [pk, increment]
+  Descripcion varchar(50)
+  created_by varchar(50)
+  created_at datetime
+  modified_by varchar(50)
+  modified_at datetime [default: 'getdate()']
+}
+
+Table tbl_Modulo{
+  Modulo_ID uniqueidentifier [pk, default: 'newid()']
+  Nombre varchar(75)
+  Descripcion varchar(100)
+  created_by varchar(50)
+  created_at datetime
+  modified_by varchar(50)
+  modified_at datetime [default: 'getdate()']
+}
+
+Table tbl_Permisos{
+  Permiso_ID integer [pk, increment]
+  Descripcion varchar(50)
+  over_modulo uniqueidentifier [ref: < tbl_Modulo.Modulo_ID]
+  created_by varchar(50)
+  created_at datetime
+  modified_by varchar(50)
+  modified_at datetime [default: 'getdate()']
+}
+
+Table tbl_Perfil{
+  Perfil_ID uniqueidentifier [pk, default: 'newid()']
+  Rol_ID integer [ref: > tbl_Roles.Rol_ID]
+  Permiso_ID integer [ref: > tbl_Permisos.Permiso_ID]
+  created_by varchar(50)
+  created_at datetime
+  modified_by varchar(50)
+  modified_at datetime [default: 'getdate()']
+}
+
+Table tbl_Users {
+  User_id uniqueidentifier [primary key]
+  username varchar(100)
+  email varchar(100) [unique]
+  password varchar(100)
+  Perfil_ID integer [ref: > tbl_Perfil.Perfil_ID]
+  created_by varchar(50)
+  created_at datetime
+  modified_by varchar(50)
+  modified_at datetime [default: 'getdate()']
+}
+
+Table tbl_Sessions{
+  Session_id integer [pk, increment]
+  User_id uniqueidentifier [ref: > tbl_Users.User_id]
+  Session_at datetime [default: 'getdate()']
+  Session_from varchar(100)
+  Session_duration timestamp
+}
