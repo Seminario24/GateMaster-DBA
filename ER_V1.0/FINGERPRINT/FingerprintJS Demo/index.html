@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FingerprintJS Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.1.0/dist/fp.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 5px;
+      overflow: auto;
+      max-height: 300px;
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="container">
+    <h1>FingerprintJS Demo</h1>
+    <p>Your visitor ID is:</p>
+    <pre id="visitor-id">Loading...</pre>
+    <p>Collected data:</p>
+    <pre id="collected-data">Loading...</pre>
+  </div>
+
+  <script>
+    console.log("Script is running...");
+
+
+    const fpPromise = FingerprintJS.load();
+
+    fpPromise
+      .then(fp => {
+        console.log("FingerprintJS loaded");
+        return fp.get();
+      })
+      .then(result => {
+        console.log("Data retrieved:", result);
+
+        const visitorId = result.visitorId;
+        console.log("Visitor ID:", visitorId);
+        
+        document.getElementById('visitor-id').innerText = visitorId;
+
+        const collectedData = JSON.stringify(result, null, 2);
+        document.getElementById('collected-data').innerText = collectedData;
+      })
+      .catch(error => {
+        console.error('Error loading FingerprintJS:', error);
+        document.getElementById('visitor-id').innerText = 'Error';
+        document.getElementById('collected-data').innerText = 'Error loading FingerprintJS';
+      });
+  </script>
+</body>
+</html>
