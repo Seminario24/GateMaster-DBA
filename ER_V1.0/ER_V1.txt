@@ -1,60 +1,159 @@
-// Use DBML to define your database structure
-// Docs: https://dbml.dbdiagram.io/docs
-
-Table tbl_Roles {
-  Rol_ID integer [pk, increment]
-  Descripcion varchar(50)
-  created_by varchar(50)
-  created_at datetime
-  modified_by varchar(50)
-  modified_at datetime [default: 'getdate()']
+// Department Table
+Table tbl_Module {
+  module_id BIGINT [pk]
+  name BIGINT
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
 }
 
-Table tbl_Modulo{
-  Modulo_ID uniqueidentifier [pk, default: 'newid()']
-  Nombre varchar(75)
-  Descripcion varchar(100)
-  created_by varchar(50)
-  created_at datetime
-  modified_by varchar(50)
-  modified_at datetime [default: 'getdate()']
+// User History Table 
+Table tbl_User_history {
+  history_number INT [pk, increment]
+  user_id uniqueidentifier [ref: > tbl_User.user_id]
+  username VARCHAR(20)
+  first_name VARCHAR(20)
+  last_name VARCHAR(20)
+  password VARCHAR(250)
+  email VARCHAR(60)
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
 }
 
-Table tbl_Permisos{
-  Permiso_ID integer [pk, increment]
-  Descripcion varchar(50)
-  over_modulo uniqueidentifier [ref: < tbl_Modulo.Modulo_ID]
-  created_by varchar(50)
-  created_at datetime
-  modified_by varchar(50)
-  modified_at datetime [default: 'getdate()']
+// Audit System-User Table
+Table tbl_Audit_User{
+  histoy_id INT [pk, increment]
+  user_id uniqueidentifier [ref: > tbl_User.user_id]
+  effective_date DATE
+  module_affected BIGINT
+  resourse_affected BIGINT
+  change_code INT
+  change_description VARCHAR(100)
 }
 
-Table tbl_Perfil{
-  Perfil_ID uniqueidentifier [pk, default: 'newid()']
-  Rol_ID integer [ref: > tbl_Roles.Rol_ID]
-  Permiso_ID integer [ref: > tbl_Permisos.Permiso_ID]
-  created_by varchar(50)
-  created_at datetime
-  modified_by varchar(50)
-  modified_at datetime [default: 'getdate()']
+// User Table
+Table tbl_User {
+  user_id uniqueidentifier [default: 'newid()', pk]
+  username VARCHAR(20)
+  first_name VARCHAR(20)
+  last_name VARCHAR(20)
+  password VARCHAR(250)
+  email VARCHAR(60) [unique]
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
 }
 
-Table tbl_Users {
-  User_id uniqueidentifier [primary key]
-  username varchar(100)
-  email varchar(100) [unique]
-  password varchar(100)
-  Perfil_ID integer [ref: > tbl_Perfil.Perfil_ID]
-  created_by varchar(50)
-  created_at datetime
-  modified_by varchar(50)
-  modified_at datetime [default: 'getdate()']
+// Role Table
+Table tbl_Role {
+  role_id BIGINT [pk]
+  name VARCHAR(20) [unique]
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Permission Table
+Table tbl_Permission {
+  permission_id BIGINT [pk]
+  type VARCHAR(10)
+  name VARCHAR(20) [unique]
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Resource Table
+Table tbl_Resource {
+  resource_id BIGINT [pk]
+  name VARCHAR(30)
+  active BOOLEAN
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// User_Department_Mapping Table
+Table tbl_User_Module {
+  user_module_id BIGINT [pk]
+  user_id uniqueidentifier [ref: > tbl_User.user_id]
+  module_id BIGINT [ref: > tbl_Module.module_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// User_Role_Mapping Table
+Table tbl_User_Role {
+  user_role_id BIGINT [pk]
+  user_id uniqueidentifier [ref: > tbl_User.user_id]
+  role_id BIGINT [ref: > tbl_Role.role_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Role_Role_Mapping Table
+Table tbl_Role_Role {
+  role_role_id BIGINT [pk]
+  parent_role_id BIGINT [ref: > tbl_Role.role_id]
+  child_role_id BIGINT [ref: > tbl_Role.role_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Role_Permission_Mapping Table
+Table tbl_Role_Permission {
+  role_permission_id BIGINT [pk]
+  role_id BIGINT [ref: > tbl_Role.role_id]
+  permission_id BIGINT [ref: > tbl_Permission.permission_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Permission_Resource_Mapping Table
+Table tbl_Permission_Resource {
+  permission_resource_id BIGINT [pk]
+  permission_id BIGINT [ref: > tbl_Permission.permission_id]
+  resource_id BIGINT [ref: > tbl_Resource.resource_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
+// Department_Resource_Mapping Table
+Table tbl_Module_Resource {
+  department_resource_id BIGINT [pk]
+  department_id BIGINT [ref: > tbl_Module.module_id]
+  resource_id BIGINT [ref: > tbl_Resource.resource_id]
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
 }
 
 Table tbl_Sessions{
   Session_id integer [pk, increment]
-  User_id uniqueidentifier [ref: > tbl_Users.User_id]
+  User_id uniqueidentifier [ref: > tbl_User.user_id]
   Session_at datetime [default: 'getdate()']
   Session_from varchar(100)
   Session_duration timestamp

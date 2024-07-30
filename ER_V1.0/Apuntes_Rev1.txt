@@ -14,4 +14,4 @@
 
 > Investigar tema del FINGERPRINT en navegadores.
 
-> Cargar información DUMMY en las tablas a la hora de desplegar.
+> Cargar información de prueba en las tablas a la hora de desplegar.

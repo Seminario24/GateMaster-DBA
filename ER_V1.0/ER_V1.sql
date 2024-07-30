@@ -1,56 +1,153 @@
-CREATE TABLE [tbl_Roles] (
-  [Rol_ID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Descripcion] varchar(50),
-  [created_by] varchar(50),
-  [created_at] datetime,
-  [modified_by] varchar(50),
-  [modified_at] datetime DEFAULT 'getdate()'
+CREATE TABLE [tbl_Module] (
+  [module_id] BIGINT PRIMARY KEY,
+  [name] BIGINT,
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
 )
 GO
 
-CREATE TABLE [tbl_Modulo] (
-  [Modulo_ID] uniqueidentifier PRIMARY KEY DEFAULT 'newid()',
-  [Nombre] varchar(75),
-  [Descripcion] varchar(100),
-  [created_by] varchar(50),
-  [created_at] datetime,
-  [modified_by] varchar(50),
-  [modified_at] datetime DEFAULT 'getdate()'
+CREATE TABLE [tbl_User_history] (
+  [history_number] INT PRIMARY KEY IDENTITY(1, 1),
+  [user_id] uniqueidentifier,
+  [username] VARCHAR(20),
+  [first_name] VARCHAR(20),
+  [last_name] VARCHAR(20),
+  [password] VARCHAR(250),
+  [email] VARCHAR(60),
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
 )
 GO
 
-CREATE TABLE [tbl_Permisos] (
-  [Permiso_ID] integer PRIMARY KEY IDENTITY(1, 1),
-  [Descripcion] varchar(50),
-  [over_modulo] uniqueidentifier,
-  [created_by] varchar(50),
-  [created_at] datetime,
-  [modified_by] varchar(50),
-  [modified_at] datetime DEFAULT 'getdate()'
+CREATE TABLE [tbl_Audit_User] (
+  [histoy_id] INT PRIMARY KEY IDENTITY(1, 1),
+  [user_id] uniqueidentifier,
+  [effective_date] DATE,
+  [module_affected] BIGINT,
+  [resourse_affected] BIGINT,
+  [change_code] INT,
+  [change_description] VARCHAR(100)
 )
 GO
 
-CREATE TABLE [tbl_Perfil] (
-  [Perfil_ID] uniqueidentifier PRIMARY KEY DEFAULT 'newid()',
-  [Rol_ID] integer,
-  [Permiso_ID] integer,
-  [created_by] varchar(50),
-  [created_at] datetime,
-  [modified_by] varchar(50),
-  [modified_at] datetime DEFAULT 'getdate()'
+CREATE TABLE [tbl_User] (
+  [user_id] uniqueidentifier PRIMARY KEY DEFAULT 'newid()',
+  [username] VARCHAR(20),
+  [first_name] VARCHAR(20),
+  [last_name] VARCHAR(20),
+  [password] VARCHAR(250),
+  [email] VARCHAR(60) UNIQUE,
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
 )
 GO
 
-CREATE TABLE [tbl_Users] (
-  [User_id] uniqueidentifier PRIMARY KEY,
-  [username] varchar(100),
-  [email] varchar(100) UNIQUE,
-  [password] varchar(100),
-  [Perfil_ID] integer,
-  [created_by] varchar(50),
-  [created_at] datetime,
-  [modified_by] varchar(50),
-  [modified_at] datetime DEFAULT 'getdate()'
+CREATE TABLE [tbl_Role] (
+  [role_id] BIGINT PRIMARY KEY,
+  [name] VARCHAR(20) UNIQUE,
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Permission] (
+  [permission_id] BIGINT PRIMARY KEY,
+  [type] VARCHAR(10),
+  [name] VARCHAR(20) UNIQUE,
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Resource] (
+  [resource_id] BIGINT PRIMARY KEY,
+  [name] VARCHAR(30),
+  [active] BOOLEAN,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_User_Module] (
+  [user_module_id] BIGINT PRIMARY KEY,
+  [user_id] uniqueidentifier,
+  [module_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_User_Role] (
+  [user_role_id] BIGINT PRIMARY KEY,
+  [user_id] uniqueidentifier,
+  [role_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Role_Role] (
+  [role_role_id] BIGINT PRIMARY KEY,
+  [parent_role_id] BIGINT,
+  [child_role_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Role_Permission] (
+  [role_permission_id] BIGINT PRIMARY KEY,
+  [role_id] BIGINT,
+  [permission_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Permission_Resource] (
+  [permission_resource_id] BIGINT PRIMARY KEY,
+  [permission_id] BIGINT,
+  [resource_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
+)
+GO
+
+CREATE TABLE [tbl_Module_Resource] (
+  [department_resource_id] BIGINT PRIMARY KEY,
+  [department_id] BIGINT,
+  [resource_id] BIGINT,
+  [created_by] VARCHAR(20),
+  [created_on] DATE,
+  [updated_by] VARCHAR(20),
+  [updated_on] DATE
 )
 GO
 
@@ -63,17 +160,47 @@ CREATE TABLE [tbl_Sessions] (
 )
 GO
 
-ALTER TABLE [tbl_Modulo] ADD FOREIGN KEY ([Modulo_ID]) REFERENCES [tbl_Permisos] ([over_modulo])
+ALTER TABLE [tbl_User_history] ADD FOREIGN KEY ([user_id]) REFERENCES [tbl_User] ([user_id])
 GO
 
-ALTER TABLE [tbl_Perfil] ADD FOREIGN KEY ([Rol_ID]) REFERENCES [tbl_Roles] ([Rol_ID])
+ALTER TABLE [tbl_Audit_User] ADD FOREIGN KEY ([user_id]) REFERENCES [tbl_User] ([user_id])
 GO
 
-ALTER TABLE [tbl_Perfil] ADD FOREIGN KEY ([Permiso_ID]) REFERENCES [tbl_Permisos] ([Permiso_ID])
+ALTER TABLE [tbl_User_Module] ADD FOREIGN KEY ([user_id]) REFERENCES [tbl_User] ([user_id])
 GO
 
-ALTER TABLE [tbl_Users] ADD FOREIGN KEY ([Perfil_ID]) REFERENCES [tbl_Perfil] ([Perfil_ID])
+ALTER TABLE [tbl_User_Module] ADD FOREIGN KEY ([module_id]) REFERENCES [tbl_Module] ([module_id])
 GO
 
-ALTER TABLE [tbl_Sessions] ADD FOREIGN KEY ([User_id]) REFERENCES [tbl_Users] ([User_id])
+ALTER TABLE [tbl_User_Role] ADD FOREIGN KEY ([user_id]) REFERENCES [tbl_User] ([user_id])
+GO
+
+ALTER TABLE [tbl_User_Role] ADD FOREIGN KEY ([role_id]) REFERENCES [tbl_Role] ([role_id])
+GO
+
+ALTER TABLE [tbl_Role_Role] ADD FOREIGN KEY ([parent_role_id]) REFERENCES [tbl_Role] ([role_id])
+GO
+
+ALTER TABLE [tbl_Role_Role] ADD FOREIGN KEY ([child_role_id]) REFERENCES [tbl_Role] ([role_id])
+GO
+
+ALTER TABLE [tbl_Role_Permission] ADD FOREIGN KEY ([role_id]) REFERENCES [tbl_Role] ([role_id])
+GO
+
+ALTER TABLE [tbl_Role_Permission] ADD FOREIGN KEY ([permission_id]) REFERENCES [tbl_Permission] ([permission_id])
+GO
+
+ALTER TABLE [tbl_Permission_Resource] ADD FOREIGN KEY ([permission_id]) REFERENCES [tbl_Permission] ([permission_id])
+GO
+
+ALTER TABLE [tbl_Permission_Resource] ADD FOREIGN KEY ([resource_id]) REFERENCES [tbl_Resource] ([resource_id])
+GO
+
+ALTER TABLE [tbl_Module_Resource] ADD FOREIGN KEY ([department_id]) REFERENCES [tbl_Module] ([module_id])
+GO
+
+ALTER TABLE [tbl_Module_Resource] ADD FOREIGN KEY ([resource_id]) REFERENCES [tbl_Resource] ([resource_id])
+GO
+
+ALTER TABLE [tbl_Sessions] ADD FOREIGN KEY ([User_id]) REFERENCES [tbl_User] ([user_id])
 GO
