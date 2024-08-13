@@ -94,7 +94,7 @@ IF NOT EXISTS (SELECT name FROM sys.filegroups WHERE is_default=1 AND name = N'P
 GO
 
 --> Creación de tablas y relaciones
-;USE gate-master
+;USE [gate-master]
 
 CREATE TABLE [tbl_App] (
   [app_id] BIGINT PRIMARY KEY,
