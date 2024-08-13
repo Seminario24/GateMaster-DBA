@@ -1,6 +1,18 @@
 // Department Table
+Table tbl_App {
+  app_id BIGINT [pk]
+  app_name VARCHAR(30)
+  app_description VARCHAR(50)
+  app_version VARCHAR(15)
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
+}
+
 Table tbl_Module {
   module_id BIGINT [pk]
+  app_id BIGINT [ref: > tbl_App.app_id]
   name BIGINT
   active BOOLEAN
   created_by VARCHAR(20)
@@ -13,6 +25,7 @@ Table tbl_Module {
 Table tbl_User_history {
   history_number INT [pk, increment]
   user_id uniqueidentifier [ref: > tbl_User.user_id]
+  allow BOOLEAN
   username VARCHAR(20)
   first_name VARCHAR(20)
   last_name VARCHAR(20)
@@ -39,6 +52,7 @@ Table tbl_Audit_User{
 // User Table
 Table tbl_User {
   user_id uniqueidentifier [default: 'newid()', pk]
+  allow BOOLEAN
   username VARCHAR(20)
   first_name VARCHAR(20)
   last_name VARCHAR(20)
@@ -86,10 +100,10 @@ Table tbl_Resource {
 }
 
 // User_Department_Mapping Table
-Table tbl_User_Module {
-  user_module_id BIGINT [pk]
+Table tbl_User_App {
+  user_app_id BIGINT [pk]
   user_id uniqueidentifier [ref: > tbl_User.user_id]
-  module_id BIGINT [ref: > tbl_Module.module_id]
+  app_id BIGINT [ref: > tbl_App.app_id]
   created_by VARCHAR(20)
   created_on DATE
   updated_by VARCHAR(20)
@@ -157,4 +171,8 @@ Table tbl_Sessions{
   Session_at datetime [default: 'getdate()']
   Session_from varchar(100)
   Session_duration timestamp
+  created_by VARCHAR(20)
+  created_on DATE
+  updated_by VARCHAR(20)
+  updated_on DATE
 }
