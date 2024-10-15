@@ -1,16 +1,8 @@
 -- Creación de la base de datos
-CREATE DATABASE "gate-master"
-    WITH 
-    OWNER = your_username,  -- Reemplaza 'your_username' con el nombre del propietario
-    ENCODING = 'UTF8',
-    LC_COLLATE = 'en_US.UTF-8',
-    LC_CTYPE = 'en_US.UTF-8',
-    TABLESPACE = pg_default,
-    CONNECTION LIMIT = -1;
+CREATE DATABASE gate_master
 
-
--- Conectarse a la base de datos "gate-master"
-\c "gate-master"
+-- Conectarse a la base de datos "gate_master"
+\c gate_master
 
 -- Extensiones necesarias
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";  -- Para generar UUIDs
@@ -19,27 +11,28 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";  -- Para generar UUIDs
 
 CREATE TABLE tbl_App (
     app_id BIGINT PRIMARY KEY,
-    app_name VARCHAR(30),
+    app_name VARCHAR(30) NOT NULL,
     app_description VARCHAR(50),
     app_version VARCHAR(15),
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tbl_Module (
-    module_id BIGINT PRIMARY KEY,
-    app_id BIGINT,
-    name VARCHAR(30),
-    active BOOLEAN,
+CREATE TABLE tbl_User (
+    user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    allow BOOLEAN,
+    username VARCHAR(20) NOT NULL UNIQUE,
+    first_name VARCHAR(20),
+    last_name VARCHAR(20),
+    password VARCHAR(250) NOT NULL,
+    email VARCHAR(60) UNIQUE,
+    active BOOLEAN DEFAULT TRUE,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
-    CONSTRAINT fk_tbl_module_app
-        FOREIGN KEY(app_id) 
-            REFERENCES tbl_App(app_id)
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tbl_User_history (
@@ -53,20 +46,20 @@ CREATE TABLE tbl_User_history (
     email VARCHAR(60),
     active BOOLEAN,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP,
     CONSTRAINT fk_user_history_user
         FOREIGN KEY(user_id) 
             REFERENCES tbl_User(user_id)
 );
 
 CREATE TABLE tbl_Audit_User (
-    histoy_id SERIAL PRIMARY KEY,
+    history_id SERIAL PRIMARY KEY,
     user_id UUID,
     effective_date DATE,
     module_affected BIGINT,
-    resourse_affected BIGINT,
+    resource_affected BIGINT,
     change_code INT,
     change_description VARCHAR(100),
     CONSTRAINT fk_audit_user_user
@@ -74,50 +67,49 @@ CREATE TABLE tbl_Audit_User (
             REFERENCES tbl_User(user_id)
 );
 
-CREATE TABLE tbl_User (
-    user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    allow BOOLEAN,
-    username VARCHAR(20),
-    first_name VARCHAR(20),
-    last_name VARCHAR(20),
-    password VARCHAR(250),
-    email VARCHAR(60) UNIQUE,
-    active BOOLEAN,
+CREATE TABLE tbl_Module (
+    module_id BIGINT PRIMARY KEY,
+    app_id BIGINT,
+    name VARCHAR(30) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tbl_module_app
+        FOREIGN KEY(app_id) 
+            REFERENCES tbl_App(app_id)
 );
 
 CREATE TABLE tbl_Role (
     role_id BIGINT PRIMARY KEY,
-    name VARCHAR(20) UNIQUE,
-    active BOOLEAN,
+    name VARCHAR(20) UNIQUE NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tbl_Permission (
     permission_id BIGINT PRIMARY KEY,
     type VARCHAR(10),
-    name VARCHAR(20) UNIQUE,
-    active BOOLEAN,
+    name VARCHAR(20) UNIQUE NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tbl_Resource (
     resource_id BIGINT PRIMARY KEY,
-    name VARCHAR(30),
-    active BOOLEAN,
+    name VARCHAR(30) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tbl_User_App (
@@ -125,9 +117,9 @@ CREATE TABLE tbl_User_App (
     user_id UUID,
     app_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user_app_user
         FOREIGN KEY(user_id) 
             REFERENCES tbl_User(user_id),
@@ -141,9 +133,9 @@ CREATE TABLE tbl_User_Role (
     user_id UUID,
     role_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user_role_user
         FOREIGN KEY(user_id) 
             REFERENCES tbl_User(user_id),
@@ -157,9 +149,9 @@ CREATE TABLE tbl_Role_Role (
     parent_role_id BIGINT,
     child_role_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_role_role_parent
         FOREIGN KEY(parent_role_id) 
             REFERENCES tbl_Role(role_id),
@@ -173,9 +165,9 @@ CREATE TABLE tbl_Role_Permission (
     role_id BIGINT,
     permission_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_role_permission_role
         FOREIGN KEY(role_id) 
             REFERENCES tbl_Role(role_id),
@@ -189,9 +181,9 @@ CREATE TABLE tbl_Permission_Resource (
     permission_id BIGINT,
     resource_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_permission_resource_permission
         FOREIGN KEY(permission_id) 
             REFERENCES tbl_Permission(permission_id),
@@ -201,15 +193,15 @@ CREATE TABLE tbl_Permission_Resource (
 );
 
 CREATE TABLE tbl_Module_Resource (
-    department_resource_id BIGINT PRIMARY KEY,
-    department_id BIGINT,
+    module_resource_id BIGINT PRIMARY KEY,
+    module_id BIGINT,
     resource_id BIGINT,
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_module_resource_module
-        FOREIGN KEY(department_id) 
+        FOREIGN KEY(module_id) 
             REFERENCES tbl_Module(module_id),
     CONSTRAINT fk_module_resource_resource
         FOREIGN KEY(resource_id) 
@@ -217,17 +209,17 @@ CREATE TABLE tbl_Module_Resource (
 );
 
 CREATE TABLE tbl_Sessions (
-    Session_id SERIAL PRIMARY KEY,
-    User_id UUID,
-    Session_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Session_from VARCHAR(100),
-    Session_duration INTERVAL,  -- Ajustado para representar duración
+    session_id SERIAL PRIMARY KEY,
+    user_id UUID,
+    session_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    session_from VARCHAR(100),
+    session_duration INTERVAL,  -- Representa duración
     created_by VARCHAR(20),
-    created_on DATE,
+    created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(20),
-    updated_on DATE,
+    updated_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_sessions_user
-        FOREIGN KEY(User_id) 
+        FOREIGN KEY(user_id) 
             REFERENCES tbl_User(user_id)
 );
 
@@ -249,7 +241,7 @@ FROM
     INNER JOIN tbl_User_App ua ON u.user_id = ua.user_id
     INNER JOIN tbl_App a ON ua.app_id = a.app_id
     INNER JOIN tbl_Module m ON a.app_id = m.app_id
-    INNER JOIN tbl_Module_Resource mr ON m.module_id = mr.department_id
+    INNER JOIN tbl_Module_Resource mr ON m.module_id = mr.module_id
     INNER JOIN tbl_Resource r ON mr.resource_id = r.resource_id
     INNER JOIN tbl_Permission_Resource pr ON r.resource_id = pr.resource_id
     INNER JOIN tbl_Permission p ON pr.permission_id = p.permission_id
